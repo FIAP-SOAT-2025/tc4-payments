@@ -3,6 +3,10 @@ import WebhookUpdatePaymentStatusUseCase from "../usecases/webhookUpdatePaymentS
 import { PaymentGateway } from "../gateways/payment.gateway";
 import { PaymentStatusEnum } from "../domain/enums/payment-status.enum";
 import { PaymentPresenter } from "../presenter/payment.presenter";
+import { CreatePaymentUseCase } from "../usecases/createPayment.usecase";
+import { CallPaymentProviderGatewayInterface } from "../interfaces/call-payment-provider-gateway.interface";
+import { PaymentProviderGateway } from "../gateways/payment-provider.gateway";
+
 export class PaymentController {
   constructor() { }
 
@@ -25,12 +29,22 @@ export class PaymentController {
     return  PaymentPresenter.toResponse(updatedPayment);
   }
 
-  /*static async getPaymentStatus(
+  static async createPaymentCheckout(
     paymentRepository: PaymentGatewayInterface,
-    id: string
+    paymentProvider: CallPaymentProviderGatewayInterface,
+    orderId: string,
+    customer_email: string,
+    amount: number,
   ) {
     const paymentGateway = this.createPaymentGateway(paymentRepository);
-    //const payment = await FindPaymentUseCase.getPaymentStatus(id, paymentGateway);
-    return PaymentResponseAdapter.adaptJsonToMessage(payment);
-  }*/
+    const paymentProviderGateway = new PaymentProviderGateway(paymentProvider);
+    const paymentCheckout = await CreatePaymentUseCase.createPayment(
+      paymentGateway,
+      paymentProviderGateway,
+      orderId,
+      customer_email,
+      amount
+    );
+    return  PaymentPresenter.toResponse(paymentCheckout);
+  }
 }
