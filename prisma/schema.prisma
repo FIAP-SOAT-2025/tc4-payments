@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentType {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+}
+
+enum PaymentStatus {
+  APPROVED
+  PENDING
+  REFUSED
+  EXPIRED
+  CANCELLED
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  status                PaymentStatus
+  type                  PaymentType
+  mercadoPagoPaymentId  String?
+  qrCode                String?
+  orderId               String        @unique
+
+  @@index([status], name: "idx_payment_status")
+}
