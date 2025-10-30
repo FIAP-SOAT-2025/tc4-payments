@@ -5,7 +5,7 @@ import ValidateStatusUseCase from "./validateStatus.usecase";
 
 export default class WebhookUpdatePaymentStatusUseCase {
   constructor() {}
-async updateStatus(
+  async updateStatus(
     paymentGatewayI: PaymentGatewayInterface,
     id: string,
     newStatus: PaymentStatusEnum

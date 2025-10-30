@@ -5,13 +5,14 @@ import { PaymentController } from 'src/payments/controllers/payment.controller';
 import { PrismaPaymentRepository } from 'src/payments/infrastructure/persistence/prismaPayment.repository';
 import { CreateCheckoutDto } from '../dto/create_checkout.dto';
 import { CallPaymentProviderGatewayInterface } from '../../../../payments/interfaces/call-payment-provider-gateway.interface';
-
+import { OrderGatewayInterface } from 'src/payments/interfaces/order-gateway.interface';
 @ApiTags('Payment')
 @Controller('/payment')
 export class PaymentApi {
   constructor(
     private readonly prismaPaymentRepository: PrismaPaymentRepository,
     private readonly callPaymentProviderGateway: CallPaymentProviderGatewayInterface,
+    private readonly orderGatewayInterface: OrderGatewayInterface,  
   ) {}
   @Patch('webhook/status/:id')
   async updateStatus(
@@ -20,6 +21,7 @@ export class PaymentApi {
   ) {
     return await PaymentController.updatePaymentStatus(
       this.prismaPaymentRepository,
+      this.orderGatewayInterface,
       id,
       updateStatusDto.status
     );
