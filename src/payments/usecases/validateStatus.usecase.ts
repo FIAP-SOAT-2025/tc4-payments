@@ -1,7 +1,9 @@
 import { BaseException } from "src/shared/exceptions/exceptions.base";
 import { Payment, PaymentStatusEnum } from '../domain/entities/payment.entity';
+
 export default class ValidateStatusUseCase {
-    constructor() {}
+  constructor() {}
+
   static validate(payment: Payment, newStatus: PaymentStatusEnum, id: string): void {
     if (payment.status === newStatus) {
       throw new BaseException(

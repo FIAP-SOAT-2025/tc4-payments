@@ -1,14 +1,16 @@
 import { PaymentGatewayInterface } from "../interfaces/payment-gateway.interface";
-import OrderGatewayInterface from "src/order/interfaces/gateways";
+import { OrderGatewayInterface } from "../interfaces/order-gateway.interface";
 import WebhookUpdatePaymentStatusUseCase from "../usecases/webhookUpdatePaymentStatus.usecase";
 import { PaymentGateway } from "../gateways/payment.gateway";
-import { OrderGateway } from "src/order/gateways/order.gateway";
-import { ItemGateway } from "src/item/gateways/item.gateway";
 import { PaymentStatusEnum } from "../domain/enums/payment-status.enum";
-import ItemRepositoryInterface from "src/item/interfaces/ItemRepositoryInterface";
 import { PaymentPresenter } from "../presenter/payment.presenter";
+import { CreatePaymentUseCase } from "../usecases/createPayment.usecase";
+import { CallPaymentProviderGatewayInterface } from "../interfaces/call-payment-provider-gateway.interface";
+import { PaymentProviderGateway } from "../gateways/payment-provider.gateway";
+import { OrderProviderGateway } from "../gateways/order-provider.gateway";
+
 export class PaymentController {
-  constructor() { }
+  constructor() {}
 
   private static createPaymentGateway(paymentRepository: PaymentGatewayInterface) {
     return new PaymentGateway(paymentRepository);
@@ -16,31 +18,42 @@ export class PaymentController {
 
   static async updatePaymentStatus(
     paymentRepository: PaymentGatewayInterface,
-    orderRepository: OrderGatewayInterface,
-    itemRepository: ItemRepositoryInterface,
+    orderGatewayInterface: OrderGatewayInterface,
     id: string,
     newStatus: PaymentStatusEnum
   ) {
     const paymentGateway = this.createPaymentGateway(paymentRepository);
-    const orderGateway = new OrderGateway(orderRepository);
-    const itemGateway = new ItemGateway(itemRepository);
+    const orderProviderGateway = new OrderProviderGateway(orderGatewayInterface);
     const useCase = new WebhookUpdatePaymentStatusUseCase();
     const updatedPayment = await useCase.updateStatus(
       paymentGateway,
-      orderGateway,
-      itemGateway,
       id,
       newStatus
     );
+    await orderProviderGateway.callUpdateOrderPaymentStatusApi(
+      updatedPayment.orderId,
+      updatedPayment.status
+    );
+
     return  PaymentPresenter.toResponse(updatedPayment);
   }
 
-  /*static async getPaymentStatus(
+  static async createPaymentCheckout(
     paymentRepository: PaymentGatewayInterface,
-    id: string
+    paymentProvider: CallPaymentProviderGatewayInterface,
+    orderId: string,
+    customer_email: string,
+    amount: number,
   ) {
     const paymentGateway = this.createPaymentGateway(paymentRepository);
-    //const payment = await FindPaymentUseCase.getPaymentStatus(id, paymentGateway);
-    return PaymentResponseAdapter.adaptJsonToMessage(payment);
-  }*/
+    const paymentProviderGateway = new PaymentProviderGateway(paymentProvider);
+    const paymentCheckout = await CreatePaymentUseCase.createPayment(
+      paymentGateway,
+      paymentProviderGateway,
+      orderId,
+      customer_email,
+      amount
+    );
+    return  PaymentPresenter.toResponse(paymentCheckout);
+  }
 }

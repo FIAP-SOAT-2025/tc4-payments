@@ -1,18 +1,18 @@
-import { Body, Controller, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { UpdateStatusDto } from '../dto/update-status.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { PaymentController } from 'src/payments/controllers/payment.controller';
 import { PrismaPaymentRepository } from 'src/payments/infrastructure/persistence/prismaPayment.repository';
-import { PrismaOrderRepository } from 'src/order/infraestructure/persistence/order.repository';
-import { PrismaItemRepository } from 'src/item/infraestructure/persistence/prismaItem.repository';
-
+import { CreateCheckoutDto } from '../dto/create_checkout.dto';
+import { CallPaymentProviderGatewayInterface } from '../../../../payments/interfaces/call-payment-provider-gateway.interface';
+import { OrderGatewayInterface } from 'src/payments/interfaces/order-gateway.interface';
 @ApiTags('Payment')
 @Controller('/payment')
 export class PaymentApi {
   constructor(
     private readonly prismaPaymentRepository: PrismaPaymentRepository,
-    private readonly prismaOrderRepository: PrismaOrderRepository,
-    private readonly prismaItemRepository: PrismaItemRepository,
+    private readonly callPaymentProviderGateway: CallPaymentProviderGatewayInterface,
+    private readonly orderGatewayInterface: OrderGatewayInterface,  
   ) {}
   @Patch('webhook/status/:id')
   async updateStatus(
@@ -21,18 +21,22 @@ export class PaymentApi {
   ) {
     return await PaymentController.updatePaymentStatus(
       this.prismaPaymentRepository,
-      this.prismaOrderRepository,
-      this.prismaItemRepository,
+      this.orderGatewayInterface,
       id,
       updateStatusDto.status
     );
   }
-  /*@Get('/status/:id')
-  async getStatus(@Param('id') id: string) {
-    console.log('----------------------------API Get payment status:', id);
-    return await PaymentController.getPaymentStatus(
+
+  @Post('/checkout')
+  async createCheckout(
+    @Body() createCheckoutDto: CreateCheckoutDto,
+  ) {
+    return await PaymentController.createPaymentCheckout(
       this.prismaPaymentRepository,
-      id
+      this.callPaymentProviderGateway,
+      createCheckoutDto.orderId,
+      createCheckoutDto.customer_email,
+      createCheckoutDto.amount,
     );
-  }*/
+  }
 }
