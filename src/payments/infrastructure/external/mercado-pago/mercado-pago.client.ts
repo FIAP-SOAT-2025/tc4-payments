@@ -18,8 +18,7 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
       const response = await firstValueFrom(this.httpService.post(process.env.API_BASE_URL!, body, { headers }));
       return response.data;
     } catch (error) {
-      console.error('Error creating payment:', error);
-      throw error; 
+      return `Error creating payment: ${error}`;
     }
   }
 

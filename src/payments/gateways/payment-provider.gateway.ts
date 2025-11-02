@@ -8,7 +8,7 @@ export class PaymentProviderGateway implements CallPaymentProviderGatewayInterfa
   async callPaymentApi(
     totalAmount: number,
     email: string,
-  ){
+  ): Promise<any> {
     return await this.paymentProvider.callPaymentApi(
       totalAmount,
       email,
