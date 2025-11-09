@@ -3,40 +3,55 @@ import { UpdateStatusDto } from '../dto/update-status.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { PaymentController } from 'src/payments/controllers/payment.controller';
 import { PrismaPaymentRepository } from 'src/payments/infrastructure/persistence/prismaPayment.repository';
-import { CreateCheckoutDto } from '../dto/create_checkout.dto';
+import { CreateCheckoutDto } from '../dto/create-checkout.dto';
 import { CallPaymentProviderGatewayInterface } from '../../../../payments/interfaces/call-payment-provider-gateway.interface';
 import { OrderGatewayInterface } from 'src/payments/interfaces/order-gateway.interface';
+import { Inject } from '@nestjs/common';
+import { ExceptionMapper } from 'src/shared/exceptions/exception.mapper';
+import { BaseException } from 'src/shared/exceptions/exceptions.base';
+
 @ApiTags('Payment')
 @Controller('/payment')
 export class PaymentApi {
   constructor(
     private readonly prismaPaymentRepository: PrismaPaymentRepository,
+    @Inject('CallPaymentProviderGatewayInterface')
     private readonly callPaymentProviderGateway: CallPaymentProviderGatewayInterface,
-    private readonly orderGatewayInterface: OrderGatewayInterface,  
+    @Inject('OrderGatewayInterface')
+    private readonly orderGatewayInterface: OrderGatewayInterface,
   ) {}
+
   @Patch('webhook/status/:id')
   async updateStatus(
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateStatusDto,
   ) {
-    return await PaymentController.updatePaymentStatus(
-      this.prismaPaymentRepository,
-      this.orderGatewayInterface,
-      id,
-      updateStatusDto.status
-    );
+    try {
+      return await PaymentController.updatePaymentStatus(
+        this.prismaPaymentRepository,
+        this.orderGatewayInterface,
+        id,
+        updateStatusDto.status
+      );
+    } catch (error) {
+      throw ExceptionMapper.mapToHttpException(error as BaseException);
+    }
   }
 
   @Post('/checkout')
   async createCheckout(
     @Body() createCheckoutDto: CreateCheckoutDto,
   ) {
-    return await PaymentController.createPaymentCheckout(
-      this.prismaPaymentRepository,
-      this.callPaymentProviderGateway,
-      createCheckoutDto.orderId,
-      createCheckoutDto.customer_email,
-      createCheckoutDto.amount,
-    );
+    try {
+      return await PaymentController.createPaymentCheckout(
+        this.prismaPaymentRepository,
+        this.callPaymentProviderGateway,
+        createCheckoutDto.orderId,
+        createCheckoutDto.customer_email,
+        createCheckoutDto.amount,
+      );
+    } catch (error) {
+      throw ExceptionMapper.mapToHttpException(error as BaseException);
+    }
   }
 }

@@ -8,6 +8,9 @@ import { CreatePaymentUseCase } from "../usecases/createPayment.usecase";
 import { CallPaymentProviderGatewayInterface } from "../interfaces/call-payment-provider-gateway.interface";
 import { PaymentProviderGateway } from "../gateways/payment-provider.gateway";
 import { OrderProviderGateway } from "../gateways/order-provider.gateway";
+import { Payment } from "../domain/entities/payment.entity";
+import { CheckoutPresenter } from "../presenter/checkout.presenter";
+import { OrderStatusEnum } from "../domain/enums/order-status.enum";
 
 export class PaymentController {
   constructor() {}
@@ -21,7 +24,7 @@ export class PaymentController {
     orderGatewayInterface: OrderGatewayInterface,
     id: string,
     newStatus: PaymentStatusEnum
-  ) {
+  ): Promise<void | string> {
     const paymentGateway = this.createPaymentGateway(paymentRepository);
     const orderProviderGateway = new OrderProviderGateway(orderGatewayInterface);
     const useCase = new WebhookUpdatePaymentStatusUseCase();
@@ -30,9 +33,10 @@ export class PaymentController {
       id,
       newStatus
     );
+
     await orderProviderGateway.callUpdateOrderPaymentStatusApi(
       updatedPayment.orderId,
-      updatedPayment.status
+      this.newOrderStatus(updatedPayment.status)
     );
 
     return  PaymentPresenter.toResponse(updatedPayment);
@@ -44,7 +48,7 @@ export class PaymentController {
     orderId: string,
     customer_email: string,
     amount: number,
-  ) {
+  ): Promise<Payment> {
     const paymentGateway = this.createPaymentGateway(paymentRepository);
     const paymentProviderGateway = new PaymentProviderGateway(paymentProvider);
     const paymentCheckout = await CreatePaymentUseCase.createPayment(
@@ -54,6 +58,15 @@ export class PaymentController {
       customer_email,
       amount
     );
-    return  PaymentPresenter.toResponse(paymentCheckout);
+    return  CheckoutPresenter.toResponse(paymentCheckout);
+  }
+
+  private static newOrderStatus(paymentStatus: PaymentStatusEnum): OrderStatusEnum {
+    if (paymentStatus === PaymentStatusEnum.APPROVED) {
+      return OrderStatusEnum.RECEIVED;
+    } else if (paymentStatus !== PaymentStatusEnum.PENDING) {
+      return OrderStatusEnum.CANCELLED;
+    }
+    return OrderStatusEnum.PENDING;
   }
 }

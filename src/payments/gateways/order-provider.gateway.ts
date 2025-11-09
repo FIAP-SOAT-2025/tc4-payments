@@ -1,3 +1,4 @@
+import { OrderStatusEnum } from "../domain/enums/order-status.enum";
 import { OrderGatewayInterface } from "../interfaces/order-gateway.interface";
 
 export class OrderProviderGateway implements OrderGatewayInterface {
@@ -7,8 +8,8 @@ export class OrderProviderGateway implements OrderGatewayInterface {
 
   async callUpdateOrderPaymentStatusApi(
     orderId: string,
-    status: string
-  ): Promise<void> {
+    status: OrderStatusEnum
+  ): Promise<void | string> {
     return await this.orderGateway.callUpdateOrderPaymentStatusApi(
       orderId,
       status
