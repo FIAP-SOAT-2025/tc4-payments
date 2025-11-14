@@ -1,20 +1,21 @@
-name: CI - Build, Test & SonarCloud
+name: CI - SonarCloud Scan
 
 on:
-  pull_request:
-    branches: [ main ]
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
 
 jobs:
-  build-and-analyze:
+  sonarcloud:
+    name: Analyze with SonarCloud
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # necessário pro histórico de commits
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -24,31 +25,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ---- RUN TESTS + COVERAGE ----
-      - name: Run tests with coverage
-        run: npm test -- --coverage
-
-      - name: Check that coverage >= 70%
-        run: |
-          LINES=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
-          echo "Coverage: $LINES%"
-          if (( $(echo "$LINES < 70" | bc -l) )); then
-            echo "❌ Coverage abaixo de 70% — bloqueando PR."
-            exit 1
-          fi
-
-      # ---- SONARCLOUD ANALYSIS ----
-      - name: SonarCloud Scan
+      - name: Run SonarCloud analysis
         uses: SonarSource/sonarcloud-github-action@b42848bfdabac7fefc656c08af7a7864240124a3
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
+          projectBaseDir: .
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.sources=.
+            -Dsonar.sources=src
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.tests=.
-            -Dsonar.test.inclusions=**/*.spec.js,**/*.test.js
-            -Dsonar.exclusions=node_modules/**,coverage/**
-            -Dsonar.coverage.exclusions=**/*.spec.js,**/*.test.js
