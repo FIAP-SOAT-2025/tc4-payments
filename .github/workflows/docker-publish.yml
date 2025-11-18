@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/TC2-G38
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/payments
 
 jobs:
   build-and-push:

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    container_name: fiap-lanchonete-postgress
+    container_name: tc4-db-payments-postgres
     image: postgres:15
     restart: always
     environment:
@@ -22,12 +22,12 @@ services:
       retries: 5
 
   node:
-    container_name: fiap-tc-lanchonete-g38
+    container_name: tc4-payments
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@fiap-lanchonete-postgress:5432/${DB_NAME}?schema=public"
+      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@tc4-db-payments-postgres:5432/${DB_NAME}?schema=public"
     ports:
       - "3000:3000"
     depends_on:
