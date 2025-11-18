@@ -13,7 +13,7 @@ module.exports = {
   // Garante geração da cobertura exatamente como o SonarCloud exige
   collectCoverage: true,
   coverageDirectory: 'coverage',
-  coverageReporters: ['lcov', 'text-summary'],
+  coverageReporters: ['lcov', 'text-summary', 'json-summary'],
 
   // Encontra seus testes em src/**/test/**/*.spec.ts
   testMatch: ['**/src/**/test/**/*.spec.ts'],
