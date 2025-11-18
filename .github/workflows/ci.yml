@@ -25,8 +25,13 @@ jobs:
       - name: Run Tests with coverage
         run: npm test -- --coverage
 
-      - name: Enforce 70% coverage threshold
+      - name: Debug coverage folder
         run: |
+          echo "Listando coverage/"
+          ls -la coverage || echo "❌ Pasta coverage não existe"
+
+          echo "Listando arquivos dentro da coverage:"
+          ls -la coverage/* || echo "❌ Nenhum arquivo dentro de coverage"
           COVERAGE=$(node -pe "require('./coverage/coverage-summary.json').total.lines.pct")
           echo "Coverage: $COVERAGE%"
           if (( $(echo "$COVERAGE < 70" | bc -l) )); then
