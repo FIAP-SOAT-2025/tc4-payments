@@ -28,6 +28,4 @@ export async function bootstrap() {
   app.useGlobalFilters();
   await app.listen(process.env.PORT ?? 3000);
 }
-if (require.main === module) {
-  bootstrap();
-}
+bootstrap();
