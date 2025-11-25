@@ -105,5 +105,4 @@ describe('bootstrap', () => {
 
     expect(appMock.listen).toHaveBeenCalledWith(3000);
   });
-
 });
