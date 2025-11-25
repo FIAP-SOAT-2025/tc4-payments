@@ -23,4 +23,8 @@ module.exports = {
     'src/**/*.ts',
     '!src/**/*.spec.ts',
   ],
+
+  coveragePathIgnorePatterns: [
+    "src/main.ts"
+  ],
 };
