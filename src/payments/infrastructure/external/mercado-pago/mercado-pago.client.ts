@@ -36,7 +36,7 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
 
   private buildHeaders(): object {
     return {
-      Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+      Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
       'X-Idempotency-Key': uuidv4(),
     };

@@ -1,0 +1,254 @@
+name: Payments Deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ['/**']
+  pull_request:
+    branches: [main]
+    paths: ['/**']
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
+
+env:
+  AWS_REGION: us-east-1
+  TF_VERSION: 1.6.0
+  EKS_CLUSTER_NAME: eks-tc3-g38-lanchonete
+  MICROSERVICE_NAME: payments
+  NAMESPACE: lanchonete-payments
+
+jobs:
+  check-dependencies:
+    name: Check Infrastructure Dependencies
+    runs-on: ubuntu-latest
+    environment: production
+    outputs:
+      infra-exists: ${{ steps.check-deps.outputs.infra-exists }}
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check EKS Cluster Exists
+        id: check-deps
+        run: |
+          # Verifica se o cluster EKS existe antes de tentar fazer deploy
+          if aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} &> /dev/null; then
+            echo "infra-exists=true" >> $GITHUB_OUTPUT
+            echo "✅ EKS cluster '${{ env.EKS_CLUSTER_NAME }}' found"
+          else
+            echo "infra-exists=false" >> $GITHUB_OUTPUT
+            echo "❌ EKS cluster '${{ env.EKS_CLUSTER_NAME }}' not found"
+            echo "⚠️  You need to deploy terraform-infra first!"
+            exit 1
+          fi
+
+  terraform-apply:
+    name: Deploy Payments Microservice
+    needs: [check-dependencies]
+    runs-on: ubuntu-latest
+    if: needs.check-dependencies.outputs.infra-exists == 'true' && (github.event.inputs.action == 'apply' || github.event.inputs.action == '')
+    defaults:
+      run:
+        working-directory: ./terraform
+    environment: production
+    env:
+      # Variáveis de ambiente específicas do Payments
+      TF_VAR_db_user: ${{ secrets.DB_USER }}
+      TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+      TF_VAR_db_name: ${{ secrets.DB_NAME }}
+      TF_VAR_mercadopago_access_token: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
+      TF_VAR_docker_image: ${{ secrets.DOCKERHUB_USERNAME }}/payments
+      TF_VAR_namespace: ${{ env.NAMESPACE }}
+      TF_VAR_microservice_name: ${{ env.MICROSERVICE_NAME }}
+
+    steps:
+      - name: 📦 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: 🔑 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ⚙️ Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: 🔗 Configure kubectl for EKS
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+          echo "✅ Kubeconfig configured for cluster: ${{ env.EKS_CLUSTER_NAME }}"
+          kubectl get nodes
+
+      - name: 🚀 Terraform Init
+        run: terraform init
+
+      - name: 📋 Terraform Plan
+        run: |
+          terraform plan -out=tfplan
+          echo "📝 Plan generated successfully"
+
+      - name: ✅ Terraform Apply
+        run: |
+          terraform apply -auto-approve tfplan
+          echo "✅ Terraform apply completed"
+
+      - name: 🔍 Verify Payments Deployment
+        run: |
+          echo "⏳ Waiting for Payments pods to be ready..."
+          kubectl wait --for=condition=ready pod \
+            -l app=${{ env.MICROSERVICE_NAME }} \
+            -n ${{ env.NAMESPACE }} \
+            --timeout=300s || echo "⚠️  Timeout waiting for pods, checking status..."
+
+          echo "📊 Pods status:"
+          kubectl get pods -n ${{ env.NAMESPACE }}
+
+          echo "📊 Services status:"
+          kubectl get services -n ${{ env.NAMESPACE }}
+
+      - name: 🌐 Get Service URL
+        id: get-url
+        run: |
+          echo "⏳ Waiting for LoadBalancer to get external IP..."
+          sleep 60
+
+          # Tenta pegar o hostname do LoadBalancer
+          LB_HOSTNAME=$(kubectl get svc ${{ env.MICROSERVICE_NAME }}-service \
+            -n ${{ env.NAMESPACE }} \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo "")
+
+          if [ -n "$LB_HOSTNAME" ]; then
+            echo "service-url=http://$LB_HOSTNAME" >> $GITHUB_OUTPUT
+            echo "✅ LoadBalancer URL: http://$LB_HOSTNAME"
+          else
+            echo "service-url=pending" >> $GITHUB_OUTPUT
+            echo "⚠️  LoadBalancer still provisioning..."
+          fi
+
+      - name: 🏥 Health Check
+        if: steps.get-url.outputs.service-url != 'pending'
+        run: |
+          URL="${{ steps.get-url.outputs.service-url }}/health"
+          echo "🔍 Testing health endpoint: $URL"
+
+          for i in {1..5}; do
+            if curl -f $URL; then
+              echo "✅ Health check passed!"
+              break
+            else
+              echo "⚠️  Attempt $i/5 failed, retrying in 30s..."
+              sleep 30
+            fi
+          done
+
+      - name: 📝 Deployment Summary
+        run: |
+          echo "================================"
+          echo "🎉 Payments Microservice Deployed!"
+          echo "================================"
+          echo "📦 Microservice: ${{ env.MICROSERVICE_NAME }}"
+          echo "🏷️  Namespace: ${{ env.NAMESPACE }}"
+          echo "☸️  Cluster: ${{ env.EKS_CLUSTER_NAME }}"
+          echo "🌍 Region: ${{ env.AWS_REGION }}"
+          echo "🌐 Service URL: ${{ steps.get-url.outputs.service-url }}"
+          echo "================================"
+
+  terraform-destroy:
+    name: Destroy Payments Microservice
+    runs-on: ubuntu-latest
+    if: github.event.inputs.action == 'destroy'
+    defaults:
+      run:
+        working-directory: ./terraform
+    environment: production
+    env:
+      TF_VAR_db_user: ${{ secrets.DB_USER }}
+      TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+      TF_VAR_db_name: ${{ secrets.DB_NAME }}
+      TF_VAR_mercadopago_access_token: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
+      TF_VAR_docker_image: ${{ secrets.DOCKERHUB_USERNAME }}/payments
+      TF_VAR_namespace: ${{ env.NAMESPACE }}
+      TF_VAR_microservice_name: ${{ env.MICROSERVICE_NAME }}
+
+    steps:
+      - name: 📦 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: 🔑 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ⚙️ Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: 🔍 Check if EKS cluster exists
+        id: check-cluster
+        run: |
+          if aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} &> /dev/null; then
+            echo "cluster-exists=true" >> $GITHUB_OUTPUT
+            echo "✅ EKS cluster exists, configuring kubectl..."
+          else
+            echo "cluster-exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️  EKS cluster not found, skipping kubectl configuration"
+          fi
+
+      - name: 🔗 Configure kubectl
+        if: steps.check-cluster.outputs.cluster-exists == 'true'
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+          kubectl get nodes || echo "⚠️  Failed to get nodes, but continuing..."
+
+      - name: 🚀 Terraform Init
+        run: terraform init
+
+      - name: 📋 Terraform Plan Destroy
+        run: terraform plan -destroy -no-color
+        continue-on-error: true
+
+      - name: 🗑️ Terraform Destroy
+        run: |
+          echo "🗑️  Destroying Payments microservice infrastructure..."
+          terraform destroy -auto-approve
+
+      - name: ✅ Verify Destruction
+        run: |
+          echo "🔍 Verifying resource destruction..."
+          if [ "${{ steps.check-cluster.outputs.cluster-exists }}" == "true" ]; then
+            kubectl get pods -n ${{ env.NAMESPACE }} 2>/dev/null || echo "✅ Namespace destroyed or not found"
+          fi
+          echo "✅ Payments destroy job completed"
