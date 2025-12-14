@@ -23,7 +23,7 @@ describe('MercadoPagoClient', () => {
 		} as any;
 		client = new MercadoPagoClient(httpService);
 		process.env.API_BASE_URL = 'http://api';
-		process.env.ACCESS_TOKEN = 'mock-token';
+		process.env.MERCADOPAGO_ACCESS_TOKEN = 'mock-token';
 	});
 
 	it('should call httpService.post with correct body and headers and return data', async () => {
