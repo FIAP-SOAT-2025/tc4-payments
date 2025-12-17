@@ -54,8 +54,8 @@ export class PaymentController {
     const paymentCheckout = await CreatePaymentUseCase.createPayment(
       paymentGateway,
       paymentProviderGateway,
-      orderId,
       customer_email,
+      orderId,
       amount
     );
     return  CheckoutPresenter.toResponse(paymentCheckout);
