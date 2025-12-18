@@ -51,3 +51,4 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
             -Dsonar.coverage.exclusions=**/*.spec.ts,src/main.ts
+            -Dsonar.coverage.overall_line_min=70.0
