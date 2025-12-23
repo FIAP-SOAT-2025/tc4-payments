@@ -32,7 +32,7 @@ variable "db_password" {
   sensitive   = true
 }
 
-variable "access_token" {
+variable "mercadopago_access_token" {
   description = "O Access Token para integração com APIs externas."
   type        = string
   sensitive   = true

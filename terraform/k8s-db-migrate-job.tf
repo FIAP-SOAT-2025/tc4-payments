@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: tc4-payments-migrate-db
-        image: fealves/tc4-payments:latest
+        image: dianabianca/tc4-payments:latest
         imagePullPolicy: IfNotPresent
         command: ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed"]
         envFrom:

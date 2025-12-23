@@ -1,10 +1,10 @@
 output "api_service_name" {
-  description = "Nome do service da API"
+  description = "Api Service Payments"
   value       = "api-service"
 }
 
 output "api_namespace" {
-  description = "Namespace da API"
+  description = "Namespace Payments"
   value       = "tc4-payments"
 }
 

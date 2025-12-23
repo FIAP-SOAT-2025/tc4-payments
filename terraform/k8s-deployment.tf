@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: tc4-payments-api
-        image: fealves/tc4-payments:latest
+        image: dianabianca/tc4-payments:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
