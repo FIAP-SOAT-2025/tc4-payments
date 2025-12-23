@@ -1,5 +1,5 @@
-resource "kubernetes_namespace" "payments_ns" {
+resource "kubernetes_namespace" "lanchonete_ns" {
   metadata {
-    name = "lanchonete-payments"
+    name = "tc4-payments"
   }
 }

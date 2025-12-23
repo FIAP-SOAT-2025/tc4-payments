@@ -4,21 +4,21 @@ resource "kubectl_manifest" "db_migrate_job" {
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: payments-db-migrate-job
-  namespace: lanchonete-payments
+  name: db-migrate-seed-job
+  namespace: tc4-payments
 spec:
   template:
     spec:
       containers:
-      - name: migrate-db
-        image: ${var.docker_image}
+      - name: tc4-payments-migrate-db
+        image: dianabianca/tc4-payments:latest
         imagePullPolicy: IfNotPresent
         command: ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed"]
         envFrom:
         - configMapRef:
-            name: payments-configmap
+            name: api-configmap
         - secretRef:
-            name: payments-secrets
+            name: api-secrets
         resources:
           requests:
             memory: "256Mi"
