@@ -1,7 +1,7 @@
-resource "kubernetes_ingress_v1" "payments_ingress" {
+resource "kubernetes_ingress_v1" "api_ingress" {
   metadata {
-    name      = "payments-ingress"
-    namespace = "lanchonete-payments"
+    name      = "api-ingress"
+    namespace = "tc4-payments"
     annotations = {
       "kubernetes.io/ingress.class" : "alb",
       "alb.ingress.kubernetes.io/scheme" : "internal",
@@ -17,7 +17,7 @@ resource "kubernetes_ingress_v1" "payments_ingress" {
           path_type = "ImplementationSpecific"
           backend {
             service {
-              name = kubernetes_service.payments_service.metadata[0].name
+              name = kubernetes_service.api_service.metadata[0].name
               port {
                 number = 80
               }
@@ -28,5 +28,5 @@ resource "kubernetes_ingress_v1" "payments_ingress" {
     }
   }
 
-  depends_on = [kubernetes_namespace.payments_ns]
+  depends_on = [kubernetes_namespace.lanchonete_ns]
 }

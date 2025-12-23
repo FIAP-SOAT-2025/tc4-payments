@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "projectName" {
   description = "The name of the project"
-  default     = "tc3-g38-lanchonete-v1"
+  default     = "tc4-lanchonete-v1"
 }
 
 variable "db_service_name" {
@@ -17,7 +17,7 @@ variable "db_service_name" {
 variable "db_namespace" {
   description = "Namespace do banco de dados"
   type        = string
-  default     = "lanchonete-db"
+  default     = "tc4-payments-db"
 }
 
 variable "db_user" {
@@ -42,15 +42,4 @@ variable "access_token" {
 variable "db_name" {
   description = "O nome do banco de dados inicial a ser criado na instância RDS."
   type        = string
-}
-
-variable "docker_image" {
-  description = "Imagem Docker do microsserviço payments"
-  type        = string
-}
-
-variable "mercadopago_access_token" {
-  description = "Access Token do Mercado Pago"
-  type        = string
-  sensitive   = true
 }
