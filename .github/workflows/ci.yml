@@ -6,6 +6,7 @@ on:
 
 jobs:
   validate:
+    name: Tests & Coverage
     runs-on: ubuntu-latest
 
     steps:
