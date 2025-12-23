@@ -25,6 +25,8 @@ const config: Config = {
     '!src/**/index.{ts,js}',
   ],
 
+  coveragePathIgnorePatterns: ['src/main.ts'],
+
   coverageThreshold: {
     global: {
       branches: 80,
