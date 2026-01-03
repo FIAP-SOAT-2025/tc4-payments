@@ -64,7 +64,7 @@ jobs:
       TF_VAR_db_user: ${{ secrets.DB_USER }}
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
       TF_VAR_db_name: ${{ secrets.DB_NAME }}
-      TF_VAR_access_token: ${{ secrets.ACCESS_TOKEN }}
+      TF_VAR_mercadopago_access_token: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -156,7 +156,7 @@ jobs:
       TF_VAR_db_user: ${{ secrets.DB_USER }}
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
       TF_VAR_db_name: ${{ secrets.DB_NAME }}
-      TF_VAR_access_token: ${{ secrets.ACCESS_TOKEN }}
+      TF_VAR_mercadopago_access_token: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
