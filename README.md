@@ -14,13 +14,11 @@
 - [Tecnologias](#️-tecnologias)
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Linguagem Ubíqua](#-linguagem-ubíqua)
-- [Desenho de requisitos do negócio](#️-requisitos-negócio)
-- [Desenho da infraestrutura](#️-requisitos-infra)
+- [Pré-requisitos](#pré-requisitos)
 - [Configuração](#️-configuração)
 - [Execução](#️-execução)
-- [Order de Execução](#️-ordem-execução)
 - [Testes](#-testes)
-- [Cobertura de Testes (Evidências)](#-cobertura-de-testes)
+- [Cobertura de Testes](#-cobertura-de-testes)
 - [Equipe](#-equipe)
 
 ---
