@@ -1,0 +1,71 @@
+{
+	"info": {
+		"_postman_id": "8d7862d3-8722-4e9e-a755-b11722e3dd38",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19988151"
+	},
+	"item": [
+		{
+			"name": "Payment Copy",
+			"item": [
+				{
+					"name": "webhook",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"APPROVED\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/payment/webhook/status/65c40ab7-5a83-4eb2-8e95-fb5302fd73cf",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"payment",
+								"webhook",
+								"status",
+								"65c40ab7-5a83-4eb2-8e95-fb5302fd73cf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer_email\": \"teste@gmail.com\",\r\n    \"amount\": 230,\r\n    \"orderId\": \"da3a4ea0-9f6b-415f-8024-ba7b231e97fc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/payment/checkout",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"payment",
+								"checkout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
