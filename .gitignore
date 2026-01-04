@@ -58,6 +58,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Prisma generated files
  generated/prisma/
 
+# Terraform
+terraform\.terraform
 
 #temp depois remover do .gitignore
 /kind
