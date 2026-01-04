@@ -23,11 +23,11 @@ resource "kubernetes_service" "api_service" {
 resource "kubernetes_service" "api_service_internal" {
   metadata {
     name      = "api-service-internal"
-    namespace = "tc4-payment"
+    namespace = "tc4-payments"
   }
   spec {
     selector = {
-      app = "tc4-payment-api"
+      app = "tc4-payments-api"
     }
     port {
       protocol    = "TCP"
