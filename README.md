@@ -4,9 +4,8 @@
 
 
 ## 📚 Recursos
-
-- [Collection Postman](https://drive.google.com/file/d/1ALtt8pY6O2XU1QKhaXTSMhZzP-9B-K7_/view?usp=sharing
-
+[![Documentação Técnica](https://img.shields.io/badge/📖-Documentação_Técnica-blue)](docs/TECHNICAL.md)
+[![Postman Collection](https://img.shields.io/badge/📮-Postman_Collection-orange)](docs/collections/payments-collection)
 ### 
 
 ## 📋 Sumário
