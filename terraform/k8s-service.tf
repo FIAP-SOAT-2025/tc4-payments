@@ -1,21 +1,18 @@
-resource "kubernetes_service" "api_service" {
+resource "kubernetes_service" "api_service_internal" {
   metadata {
-    name      = "api-service"
-    namespace = "tc4-payments"
-    annotations = {
-      "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
-    }
+    name      = "api-service-internal"
+    namespace = "tc4-payment"
   }
   spec {
     selector = {
-      app = "tc4-payments-api"
+      app = "tc4-payment-api"
     }
     port {
       protocol    = "TCP"
       port        = 80
       target_port = 3000
     }
-    type = "LoadBalancer"
+    type = "ClusterIP"
   }
   depends_on = [kubernetes_namespace.lanchonete_ns]
 }
