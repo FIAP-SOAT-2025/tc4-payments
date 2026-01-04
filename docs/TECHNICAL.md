@@ -552,22 +552,7 @@ class CheckoutPresenter {
 
 ---
 
-### 5. Event-Driven Preparado (mas não usado)
-
-**Decisão**: `EventEmitterModule` importado, mas comunicação atual é síncrona HTTP.
-
-**Razão**:
-- Preparação para evolução futura com mensageria (RabbitMQ, Kafka)
-- Atualmente, simplicidade da comunicação HTTP é suficiente
-- Complexidade reduzida na primeira versão
-
-**Evolução Futura**:
-- Substituir `OrderClient` HTTP por publicação de eventos
-- Adicionar filas de mensagens para resiliência
-
----
-
-### 6. Desacoplamento de Serviços (No Shared Database)
+### 5. Desacoplamento de Serviços
 
 **Decisão**: Cada microsserviço tem seu próprio banco de dados. Sem foreign keys entre serviços.
 
@@ -583,7 +568,7 @@ class CheckoutPresenter {
 
 ---
 
-### 7. Idempotência em Chamadas Externas
+### 6. Idempotência em Chamadas Externas
 
 **Decisão**: Uso de `X-Idempotency-Key` (UUID) nas chamadas ao Mercado Pago.
 
@@ -594,7 +579,7 @@ class CheckoutPresenter {
 
 ---
 
-### 8. Status Enum Centralizado
+### 7. Status Enum Centralizado
 
 **Decisão**: Enums para estados de pagamento e pedidos definidos no domínio.
 
@@ -622,7 +607,7 @@ enum PaymentTypeEnum {
 
 ---
 
-### 9. Logging Estratégico
+### 8. Logging Estratégico
 
 **Decisão**: Logs em pontos críticos (criação, atualização, chamadas externas).
 
@@ -633,7 +618,7 @@ enum PaymentTypeEnum {
 
 ---
 
-### 10. Health Check para Kubernetes
+### 9. Health Check para Kubernetes
 
 **Decisão**: Endpoint `/health` dedicado para probes.
 
