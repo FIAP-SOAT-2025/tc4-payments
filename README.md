@@ -1,10 +1,9 @@
-# 🍔 Sistema de Controle de Pedidos - Microsserviço de Pagamentos
+# Microsserviço de Pagamentos - Sistema de Controle de Pedidos 🍔
 
 > **Tech Challenge FIAP - Fase 04 
 
-
-## 📚 Recursos
-[![Documentação Técnica](https://img.shields.io/badge/📖-Documentação_Técnica-blue)](docs/TECHNICAL.md)
+## 📚 Recursos Importantes
+[![Documentação Técnica e Arquitetural](https://img.shields.io/badge/📖-Documentação_Técnica-blue)](docs/TECHNICAL.md)
 [![Postman Collection](https://img.shields.io/badge/📮-Postman_Collection-orange)](docs/collections/payments-collection)
 ### 
 
@@ -21,6 +20,7 @@
 - [Execução](#️-execução)
 - [Order de Execução](#️-ordem-execução)
 - [Testes](#-testes)
+- [Cobertura de Testes (Evidências)](#-cobertura-de-testes)
 - [Equipe](#-equipe)
 
 ---
@@ -217,15 +217,7 @@ DB_USER=
 DB_PASSWORD= 
 DB_NAME= 
 API_BASE_URL=
-ACCESS_TOKEN= 
-
-
-```
-### IMPORTANTE!
-A env ACCESS_TOKEN é de necessária para a conexão com a API do Mercado Pago, e seu valor estará no [Drive do Projeto](https://docs.google.com/document/d/1VSRjj57Eax54N8XnDkh8X8qgpX06bfv8/edit#heading=h.57tg4az9s2oq)
-```env
-ACCESS_TOKEN = 
-```
+MERCADOPAGO_ACCESS_TOKEN= 
 
 ## Opção 1: Setup Completo com Docker (Recomendado)
 
@@ -243,10 +235,7 @@ npm install
 # 3. Subir apenas o banco de dados
 docker-compose up db -d
 ```
-
 ---
-
-
 
 ### Setup do Banco de Dados
 
@@ -286,6 +275,18 @@ npm run test:watch
 # Coverage
 npm run test:cov
 ```
+---
+
+## 🧪 Cobertura de Testes
+
+#### Cobertura acima de 70% no SonarQube
+![Cobertura SonarQube](docs/evidences/payments-sonar.png)
+
+#### Cobertura acima de 80% no Microsserviço de Payments
+![Cobertura no Projeto](docs/evidences/coverage-payments.png)
+
+#### Validação de corbertura de testes e review para liberar o merge
+![Validação](docs/evidences/github-validations.png)
 
 ---
 

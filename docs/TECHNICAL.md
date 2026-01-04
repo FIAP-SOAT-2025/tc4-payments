@@ -1,4 +1,4 @@
-# Microsserviço de Pagamentos - FIAP Fast Food
+# Microsserviço de Pagamentos - Documentação Técnica
 
 ## Índice
 
@@ -10,8 +10,6 @@
 6. [Comunicação com Outros Microsserviços](#comunicação-com-outros-microsserviços)
 7. [Decisões Arquiteturais](#decisões-arquiteturais)
 8. [Infraestrutura e Deploy](#infraestrutura-e-deploy)
-9. [Configuração e Execução](#configuração-e-execução)
-10. [Testes](#testes)
 
 ---
 
@@ -991,3 +989,15 @@ NODE_TLS_REJECT_UNAUTHORIZED=0  # Apenas dev/staging
 ```
 
 ---
+
+
+## 🧪 Cobertura de Testes
+
+#### Cobertura acima de 70% no SonarQube
+![Cobertura SonarQube](./evidences/payments-sonar.png)
+
+#### Cobertura acima de 80% no Microsserviço de Payments
+![Cobertura no Projeto](./evidences/coverage-payments.png)
+
+#### Validação de corbertura de testes e review para liberar o merge
+![Validação](./evidences/github-validations.png)
