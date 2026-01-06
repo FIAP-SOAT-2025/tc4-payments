@@ -103,26 +103,17 @@ jobs:
       
       - name: Verify API Deployment
         run: |
-          echo "Waiting for pods to be created..."
-          for i in {1..30}; do
-            if kubectl get pods -l app=lanchonete-api -n lanchonete-tc2 2>/dev/null | grep -q lanchonete-api; then
-              echo "Pods found, waiting for ready state..."
-              kubectl wait --for=condition=ready pod -l app=lanchonete-api -n lanchonete-tc2 --timeout=10m
-              break
-            fi
-            echo "Attempt $i: No pods found yet, waiting 10s..."
-            sleep 10
-          done
-          
-          kubectl get pods -n lanchonete-tc2
-          kubectl get services -n lanchonete-tc2
+          echo "Waiting for API pod to be ready..."
+          kubectl wait --for=condition=ready pod -l app=tc4-payments-api -n tc4-payments --timeout=5m
+          kubectl get pods -n tc4-payments
+          kubectl get services -n tc4-payments
       
       - name: Get LoadBalancer URL
         id: get-url
         run: |
           echo "Waiting for LoadBalancer to get external IP..."
           sleep 60
-          LB_HOSTNAME=$(kubectl get svc api-service -n lanchonete-tc2 -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          LB_HOSTNAME=$(kubectl get svc api-service -n tc4-payments -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
           if [ -n "$LB_HOSTNAME" ]; then
             echo "loadbalancer-url=http://$LB_HOSTNAME" >> $GITHUB_OUTPUT
             echo "LoadBalancer URL: http://$LB_HOSTNAME"
@@ -149,7 +140,7 @@ jobs:
       - name: Output API Info
         run: |
           echo "API deployed successfully!"
-          echo "Namespace: lanchonete-tc2"
+          echo "Namespace: tc4-payments"
           echo "Service: api-service"
           echo "LoadBalancer: ${{ steps.get-url.outputs.loadbalancer-url }}"
 
@@ -235,6 +226,6 @@ jobs:
         run: |
           echo "Verifying resource destruction..."
           if [ "${{ steps.check-cluster.outputs.cluster-exists }}" == "true" ]; then
-            kubectl get pods -n lanchonete-tc2 2>/dev/null || echo "Namespace lanchonete-tc2 destroyed or not found"
+            kubectl get pods -n tc4-payments 2>/dev/null || echo "Namespace tc4-payments destroyed or not found"
           fi
           echo "API destroy job completed"
