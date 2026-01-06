@@ -28,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: dianabianca/payment
+          images: dianabianca/tc4-payments
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-
@@ -42,5 +42,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=dianabianca/tc4-payment:buildcache
-          cache-to: type=registry,ref=dianabianca/tc4-payment:buildcache,mode=max
+          cache-from: type=registry,ref=dianabianca/tc4-payments:buildcache
+          cache-to: type=registry,ref=dianabianca/tc4-payments:buildcache,mode=max

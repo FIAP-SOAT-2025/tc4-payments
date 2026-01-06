@@ -867,7 +867,7 @@ CMD ["node", "dist/src/main"]
 1. Checkout código
 2. Login no Docker Hub
 3. Build imagem Docker
-4. Tag: `dianabianca/payment:latest`
+4. Tag: `dianabianca/tc4-payments:latest`
 5. Push para Docker Hub
 6. Cache de layers para builds futuros
 
