@@ -104,7 +104,7 @@ jobs:
       - name: Verify API Deployment
         run: |
           echo "Waiting for API pod to be ready..."
-          kubectl wait --for=condition=ready pod -l app=lanchonete-api -n lanchonete-tc2 --timeout=300s
+          kubectl wait --for=condition=ready pod -l app=lanchonete-api -n lanchonete-tc2 --timeout=10m
           kubectl get pods -n lanchonete-tc2
           kubectl get services -n lanchonete-tc2
       
