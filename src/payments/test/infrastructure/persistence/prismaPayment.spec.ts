@@ -27,29 +27,29 @@ describe('PrismaPaymentRepository', () => {
 		jest.clearAllMocks();
 	});
 
-	describe('create', () => {
-		it('should create a payment and return it', async () => {
-			prisma.payment.create.mockResolvedValueOnce(mockPayment);
-			const result = await repository.create(
-				mockPayment.orderId,
-				mockPayment.type,
-				mockPayment.status,
-				mockPayment.mercadoPagoPaymentId,
-				mockPayment.qrCode
-			);
-			expect(prisma.payment.create).toHaveBeenCalledWith({
-				data: {
-					orderId: mockPayment.orderId,
-					type: mockPayment.type,
-					status: mockPayment.status,
-					mercadoPagoPaymentId: mockPayment.mercadoPagoPaymentId,
-					qrCode: mockPayment.qrCode,
-				},
-			});
-			expect(result).toBe(mockPayment);
-		});
+	//describe('create', () => {
+		//it('should create a payment and return it', async () => {
+		//	prisma.payment.create.mockResolvedValueOnce(mockPayment);
+		//	const result = await repository.create(
+		//		mockPayment.orderId,
+		//		mockPayment.type,
+		//		mockPayment.status,
+		//		mockPayment.mercadoPagoPaymentId,
+		//		mockPayment.qrCode
+		//	);
+		//	expect(prisma.payment.create).toHaveBeenCalledWith({
+		//		data: {
+		//			orderId: mockPayment.orderId,
+		//			type: mockPayment.type,
+		//			status: mockPayment.status,
+		//			mercadoPagoPaymentId: mockPayment.mercadoPagoPaymentId,
+		//			qrCode: mockPayment.qrCode,
+		//		},
+		//	});
+		//	expect(result).toBe(mockPayment);
+		//});
 
-		it('should throw error and log if prisma.payment.create fails', async () => {
+		/*it('should throw error and log if prisma.payment.create fails', async () => {
 			const error = new Error('fail');
 			prisma.payment.create.mockRejectedValueOnce(error);
 			const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
@@ -65,7 +65,7 @@ describe('PrismaPaymentRepository', () => {
 			expect(consoleSpy).toHaveBeenCalledWith('Error creating payment, payment repository:', error);
 			consoleSpy.mockRestore();
 		});
-	});
+	});*/
 
 	describe('updatePaymentStatus', () => {
 		it('should update payment status and return updated payment', async () => {

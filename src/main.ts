@@ -27,7 +27,7 @@ export async function bootstrap() {
 
   app.useGlobalFilters();
   await app.listen(process.env.PORT ?? 3000);
-  console.log('|      PAYMENTS MICROSSERVICE IS RUNNING      |');
+  console.log('|      PAYMENTS MICROSSERVICE IS RUNNING!!      |');
 }
 
 bootstrap();

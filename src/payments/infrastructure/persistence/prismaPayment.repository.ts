@@ -18,15 +18,22 @@ export class PrismaPaymentRepository implements PaymentGatewayInterface {
     qrCode: string,
   ): Promise<any> {
     try {
-      return await this.prisma.payment.create({
-        data: {
-          orderId: orderId,
-          type: type as PaymentTypeEnum,
-          status: status as PaymentStatusEnum,
-          mercadoPagoPaymentId: mercadoPagoPaymentId,
-          qrCode: qrCode,
-        },
-      });
+     return await this.prisma.payment.upsert({
+      where: { orderId: orderId },
+      update: {
+        type: type as PaymentTypeEnum,
+        status: status as PaymentStatusEnum,
+        mercadoPagoPaymentId: mercadoPagoPaymentId,
+        qrCode: qrCode,
+      },
+      create: {
+        orderId: orderId,
+        type: type as PaymentTypeEnum,
+        status: status as PaymentStatusEnum,
+        mercadoPagoPaymentId: mercadoPagoPaymentId,
+        qrCode: qrCode,
+      },
+    });
     } catch (error) {
       console.error('Error creating payment, payment repository:', error);
       throw new Error('Failed to create payment');
