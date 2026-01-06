@@ -5,6 +5,15 @@ resource "kubectl_manifest" "deployment" {
     kubectl_manifest.secrets,
     kubectl_manifest.configmap
   ]
+
+  override_namespace = "tc4-payments"
+  wait               = true
+  wait_for_rollout   = true
+
+  timeouts {
+    create = "10m"
+  }
+
   yaml_body = <<YAML
 apiVersion: apps/v1
 kind: Deployment
