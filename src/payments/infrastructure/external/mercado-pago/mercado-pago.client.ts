@@ -17,7 +17,7 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
     console.log("Entrei no call payment api");
     try {
       const response = await firstValueFrom(this.httpService.post(process.env.API_BASE_URL!, body, { headers }));
-      console.log("response do mercado pago", response);
+      console.log(`MP CLIENT | CALL PAYMENT API | RESPONSE : ${response}`);
       return response.data;
     } catch (error) {
       return `Error creating payment: ${error}`;
