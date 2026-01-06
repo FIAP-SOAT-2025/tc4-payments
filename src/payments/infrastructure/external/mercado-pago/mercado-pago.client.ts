@@ -14,12 +14,16 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
   async callPaymentApi(totalAmount: number, email: string): Promise<any> {
     const body = await this.buildPaymentBody(totalAmount, email);
     const headers = this.buildHeaders();
-    console.log("Entrei no call payment api");
+    console.log(`MP CLIENT | CALL PAYMENT API | BODY : ${body}`);
+    console.log(`MP CLIENT | CALL PAYMENT API | HEADER : ${headers}`);
+
     try {
+      console.log(`MP CLIENT | CALL PAYMENT API | URL API : ${process.env.API_BASE_URL}`);
       const response = await firstValueFrom(this.httpService.post(process.env.API_BASE_URL!, body, { headers }));
       console.log(`MP CLIENT | CALL PAYMENT API | RESPONSE : ${response}`);
       return response.data;
     } catch (error) {
+      console.log(`MP CLIENT | CALL PAYMENT API | ERROR : ${error}`);
       return `Error creating payment: ${error}`;
     }
   }
