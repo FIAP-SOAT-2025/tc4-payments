@@ -18,8 +18,8 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
     console.log(`MP CLIENT | CALL PAYMENT API | HEADER : ${headers}`);
 
     try {
-      console.log(`MP CLIENT | CALL PAYMENT API | URL API : ${process.env.API_BASE_URL}`);
-      const response = await firstValueFrom(this.httpService.post('https://api.mercadopago.com/v1/payments', body, { headers }));
+      console.log(`MP CLIENT | CALL PAYMENT API | URL API : https://api.mercadopago.com/v1/orders`);
+      const response = await firstValueFrom(this.httpService.post('https://api.mercadopago.com/v1/orders', body, { headers }));
       console.log(`MP CLIENT | CALL PAYMENT API | RESPONSE : ${response}`);
       return response.data;
     } catch (error) {
@@ -31,13 +31,26 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
   private async buildPaymentBody(totalAmount: number, email: string): Promise<object> {
     const payer_email = email;
     return {
-      transaction_amount: totalAmount,
-      description: 'FIAP Fast Food Payment',
-      payment_method_id: PaymentTypeEnum.PIX.toLowerCase(),
-      payer: {
-        email: payer_email,
+      type: "online",
+      "total_amount": totalAmount,
+      "external_reference": uuidv4(),
+      "transactions": {
+        "payments": [
+          {
+            "amount": totalAmount,
+            "payment_method": {
+              "id": PaymentTypeEnum.PIX.toLowerCase(),
+              "type": "bank_transfer"
+            }
+          }
+        ]
       },
+      "payer": {
+        "email": payer_email
+      }
     };
+
+    
   }
 
   private buildHeaders(): object {

@@ -16,8 +16,8 @@ export class CreatePaymentUseCase  {
 
     const provideResponse = await paymentProvider.callPaymentApi(totalAmount, email);
     const paymentId = String(provideResponse.id);
-    const qrCode = provideResponse.point_of_interaction?.transaction_data?.qr_code;
-    const status = (provideResponse.status.toUpperCase() as PaymentStatusEnum);
+    const qrCode = provideResponse.transactions?.payments?.payment_method.qr_code;
+    const status = PaymentStatusEnum.PENDING;
     const type = PaymentTypeEnum.PIX
 
     return paymentGateway.create( orderId, type, status, paymentId, qrCode);
