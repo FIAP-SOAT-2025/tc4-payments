@@ -18,8 +18,8 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
     console.log(`MP CLIENT | CALL PAYMENT API | HEADER : ${headers}`);
 
     try {
-      console.log(`MP CLIENT | CALL PAYMENT API | URL API : ${process.env.API_BASE_URL}`);
-      const response = await firstValueFrom(this.httpService.post(process.env.API_BASE_URL, body, { headers }));
+      console.log(`MP CLIENT | CALL PAYMENT API | URL API : https://api.mercadopago.com/v1/orders`);
+      const response = await firstValueFrom(this.httpService.post('https://api.mercadopago.com/v1/orders', body, { headers }));
       console.log(`MP CLIENT | CALL PAYMENT API | RESPONSE : ${response}`);
       return response.data;
     } catch (error) {
