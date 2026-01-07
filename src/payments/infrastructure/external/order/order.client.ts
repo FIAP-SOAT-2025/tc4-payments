@@ -15,8 +15,7 @@ export class OrderClient implements OrderGatewayInterface {
     status: OrderStatusEnum
   ): Promise<void | string> {
     try {
-      console.log(`ORDER CLIENT| UPDATE STATUS ORDER | ORDER URL : ${process.env.API_ORDER_URL}`);
-      await firstValueFrom(this.httpService.patch(`${process.env.API_ORDER_URL}/order/${orderId}/status`, { status }));
+      await firstValueFrom(this.httpService.patch(`http://api-service-internal.tc4-order.svc.cluster.local/order/${orderId}/status`, { status }));
       return;
     } catch (error) {
       console.log(`ORDER CLIENT| UPDATE STATUS ORDER | ERROR : ${error}`);

@@ -38,18 +38,6 @@ variable "mercadopago_access_token" {
   sensitive   = true
 }
 
-variable "api_base_url" {
-  description = "Url para pagamento do mercado Pago."
-  type        = string
-  sensitive   = true
-}
-
-variable "api_order_url" {
-  description = "Url para comunicar com microsserviço de Order."
-  type        = string
-  sensitive   = true
-}
-
 variable "db_name" {
   description = "O nome do banco de dados inicial a ser criado na instância RDS."
   type        = string
