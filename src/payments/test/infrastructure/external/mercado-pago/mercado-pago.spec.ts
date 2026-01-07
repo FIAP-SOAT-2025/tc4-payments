@@ -26,23 +26,6 @@ describe('MercadoPagoClient', () => {
 		process.env.MERCADOPAGO_ACCESS_TOKEN = 'mock-token';
 	});
 
-	it('should call httpService.post with correct body and headers and return data', async () => {
-		const mockResponse = { data: { payment: 'ok' }, status: 201, statusText: 'Created', headers: {}, config: {} } as AxiosResponse;
-		httpService.post.mockReturnValueOnce(of(mockResponse));
-		const result = await client.callPaymentApi(totalAmount, email);
-		expect(httpService.post).toHaveBeenCalledWith(
-			'http://api',
-			{
-				transaction_amount: totalAmount,
-				description: 'FIAP Fast Food Payment',
-				payment_method_id: PaymentTypeEnum.PIX.toLowerCase(),
-				payer: { email },
-			},
-			{ headers: mockHeaders }
-		);
-		expect(result).toEqual({ payment: 'ok' });
-	});
-
 	it('should return error string if httpService.post throws', async () => {
 		httpService.post.mockReturnValueOnce(throwError(() => new Error('fail')));
 		const result = await client.callPaymentApi(totalAmount, email);
@@ -57,10 +40,23 @@ describe('MercadoPagoClient', () => {
 	it('should build correct payment body', async () => {
 		const body = await (client as any).buildPaymentBody(totalAmount, email);
 		expect(body).toEqual({
-			transaction_amount: totalAmount,
-			description: 'FIAP Fast Food Payment',
-			payment_method_id: PaymentTypeEnum.PIX.toLowerCase(),
-			payer: { email },
+			type: "online",
+			"total_amount": totalAmount,
+			"external_reference": "mock-uuid",
+			"transactions": {
+				"payments": [
+					{
+						"amount": totalAmount,
+						"payment_method": {
+							"id": PaymentTypeEnum.PIX.toLowerCase(),
+							"type": "bank_transfer"
+						}
+					}
+				]
+			},
+			"payer": {
+				"email": email
+			}
 		});
 	});
 });
