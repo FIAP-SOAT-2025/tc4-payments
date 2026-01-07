@@ -19,7 +19,7 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
 
     try {
       console.log(`MP CLIENT | CALL PAYMENT API | URL API : ${process.env.API_BASE_URL}`);
-      const response = await firstValueFrom(this.httpService.post(process.env.API_BASE_URL!, body, { headers }));
+      const response = await firstValueFrom(this.httpService.post('https://api.mercadopago.com/v1/payments', body, { headers }));
       console.log(`MP CLIENT | CALL PAYMENT API | RESPONSE : ${response}`);
       return response.data;
     } catch (error) {
@@ -41,6 +41,7 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
   }
 
   private buildHeaders(): object {
+    console.log(`MP CLIENT | CALL PAYMENT API | TOKEN : ${process.env.MERCADOPAGO_ACCESS_TOKEN}`);
     return {
       Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
