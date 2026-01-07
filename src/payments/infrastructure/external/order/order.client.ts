@@ -15,9 +15,11 @@ export class OrderClient implements OrderGatewayInterface {
     status: OrderStatusEnum
   ): Promise<void | string> {
     try {
-      await firstValueFrom(this.httpService.patch(`${process.env.API_BASE_URL}/order/payment-status/${orderId}`, { status }));
+      console.log(`ORDER CLIENT| UPDATE STATUS ORDER | ORDER URL : ${process.env.API_ORDER_URL}`);
+      await firstValueFrom(this.httpService.patch(`${process.env.API_ORDER_URL}/order/${orderId}/status`, { status }));
       return;
     } catch (error) {
+      console.log(`ORDER CLIENT| UPDATE STATUS ORDER | ERROR : ${error}`);
       return `Error updating order payment status: ${error}`;
     }
   }
