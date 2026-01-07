@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post, Get} from '@nestjs/common';
 import { UpdateStatusDto } from '../dto/update-status.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { PaymentController } from 'src/payments/controllers/payment.controller';
@@ -55,5 +55,13 @@ export class PaymentApi {
     } catch (error) {
       throw ExceptionMapper.mapToHttpException(error as BaseException);
     }
+  }
+
+  @Get('/status/:id')
+  async getStatus(@Param('id') id: string) {
+    return await PaymentController.getPaymentStatus(
+      this.prismaPaymentRepository,
+      id
+    );
   }
 }

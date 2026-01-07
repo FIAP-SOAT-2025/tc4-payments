@@ -5,12 +5,14 @@ import { PaymentGateway } from "../gateways/payment.gateway";
 import { PaymentStatusEnum } from "../domain/enums/payment-status.enum";
 import { PaymentPresenter } from "../presenter/payment.presenter";
 import { CreatePaymentUseCase } from "../usecases/createPayment.usecase";
+import { FindPaymentUseCase } from "../usecases/findPayment.usecase";
 import { CallPaymentProviderGatewayInterface } from "../interfaces/call-payment-provider-gateway.interface";
 import { PaymentProviderGateway } from "../gateways/payment-provider.gateway";
 import { OrderProviderGateway } from "../gateways/order-provider.gateway";
 import { Payment } from "../domain/entities/payment.entity";
 import { CheckoutPresenter } from "../presenter/checkout.presenter";
 import { OrderStatusEnum } from "../domain/enums/order-status.enum";
+import { PaymentResponseAdapter } from "../infrastructure/adapters/payment-response.adapter";
 
 export class PaymentController {
   constructor() {}
@@ -68,5 +70,14 @@ export class PaymentController {
       return OrderStatusEnum.CANCELLED;
     }
     return OrderStatusEnum.PENDING;
+  }
+
+  static async getPaymentStatus(
+    paymentRepository: PaymentGatewayInterface,
+    id: string
+  ) {
+    const paymentGateway = this.createPaymentGateway(paymentRepository);
+    const payment = await FindPaymentUseCase.getPaymentStatus(id, paymentGateway);
+    return PaymentResponseAdapter.adaptJsonToMessage(payment);
   }
 }
