@@ -46,15 +46,13 @@ describe("FindPaymentUseCase", () => {
       const paymentId = "non-existent-id";
       mockPaymentGateway.find.mockResolvedValue(null);
 
-      try {
-        await FindPaymentUseCase.getPaymentStatus(paymentId, mockPaymentGateway);
-        fail("Should have thrown an exception");
-      } catch (error) {
-        expect(error).toBeInstanceOf(BaseException);
-        expect(error.message).toBe(`Payment with ID ${paymentId} not found`);
-        expect(error.statusCode).toBe(404);
-        expect(error.errorCode).toBe("PAYMENT_NOT_FOUND");
-      }
+      await expect(
+        FindPaymentUseCase.getPaymentStatus(paymentId, mockPaymentGateway)
+      ).rejects.toMatchObject({
+        message: `Payment with ID ${paymentId} not found`,
+        statusCode: 404,
+        errorCode: "PAYMENT_NOT_FOUND"
+      });
     });
 
     it("should throw exception with correct error code", async () => {
