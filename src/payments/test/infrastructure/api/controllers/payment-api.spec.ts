@@ -59,4 +59,38 @@ describe('PaymentApi', () => {
 
     expect(ExceptionMapper.mapToHttpException).toHaveBeenCalledWith(error);
   });
+
+  describe('getStatus', () => {
+    it('should call PaymentController.getPaymentStatus and return result', async () => {
+      const id = 'payment-id-123';
+      const expectedResult = JSON.stringify({
+        id: 'payment-id-123',
+        orderId: 'order-123',
+        status: PaymentStatusEnum.APPROVED,
+      });
+
+      (PaymentController.getPaymentStatus as jest.Mock).mockResolvedValue(expectedResult);
+
+      const result = await paymentApi.getStatus(id);
+
+      expect(PaymentController.getPaymentStatus).toHaveBeenCalledWith(
+        prismaPaymentRepository,
+        id
+      );
+      expect(result).toBe(expectedResult);
+    });
+
+    it('should call PaymentController.getPaymentStatus with correct parameters', async () => {
+      const id = 'specific-payment-id';
+      (PaymentController.getPaymentStatus as jest.Mock).mockResolvedValue('{}');
+
+      await paymentApi.getStatus(id);
+
+      expect(PaymentController.getPaymentStatus).toHaveBeenCalledTimes(1);
+      expect(PaymentController.getPaymentStatus).toHaveBeenCalledWith(
+        prismaPaymentRepository,
+        id
+      );
+    });
+  });
 });

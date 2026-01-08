@@ -18,7 +18,6 @@ export class OrderClient implements OrderGatewayInterface {
       await firstValueFrom(this.httpService.patch(`http://api-service-internal.tc4-order.svc.cluster.local/order/${orderId}/status`, { status }));
       return;
     } catch (error) {
-      console.log(`ORDER CLIENT| UPDATE STATUS ORDER | ERROR : ${error}`);
       return `Error updating order payment status: ${error}`;
     }
   }

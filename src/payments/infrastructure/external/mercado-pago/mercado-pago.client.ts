@@ -14,16 +14,11 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
   async callPaymentApi(totalAmount: number, email: string): Promise<any> {
     const body = await this.buildPaymentBody(totalAmount, email);
     const headers = this.buildHeaders();
-    console.log(`MP CLIENT | CALL PAYMENT API | BODY : ${body}`);
-    console.log(`MP CLIENT | CALL PAYMENT API | HEADER : ${headers}`);
 
     try {
-      console.log(`MP CLIENT | CALL PAYMENT API | URL API : https://api.mercadopago.com/v1/orders`);
       const response = await firstValueFrom(this.httpService.post('https://api.mercadopago.com/v1/orders', body, { headers }));
-      console.log(`MP CLIENT | CALL PAYMENT API | RESPONSE : ${response}`);
       return response.data;
     } catch (error) {
-      console.log(`MP CLIENT | CALL PAYMENT API | ERROR : ${error}`);
       return `Error creating payment: ${error}`;
     }
   }
@@ -48,13 +43,10 @@ export class MercadoPagoClient implements CallPaymentProviderGatewayInterface{
       "payer": {
         "email": payer_email
       }
-    };
-
-    
+    }; 
   }
 
   private buildHeaders(): object {
-    console.log(`MP CLIENT | CALL PAYMENT API | TOKEN : ${process.env.MERCADOPAGO_ACCESS_TOKEN}`);
     return {
       Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
