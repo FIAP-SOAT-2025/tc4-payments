@@ -27,7 +27,6 @@ export class PaymentApi {
     @Body() updateStatusDto: UpdateStatusDto,
   ) {
     try {
-      console.log(`PAYMENT API | WEBHOOK | DATA : ${JSON.stringify(updateStatusDto)}`);
       return await PaymentController.updatePaymentStatus(
         this.prismaPaymentRepository,
         this.orderGatewayInterface,
@@ -44,7 +43,6 @@ export class PaymentApi {
     @Body() createCheckoutDto: CreateCheckoutDto,
   ) {
     try {
-      console.log(`PAYMENT API | CHECKOUT | DATA : ${JSON.stringify(createCheckoutDto)}`);
       return await PaymentController.createPaymentCheckout(
         this.prismaPaymentRepository,
         this.callPaymentProviderGateway,

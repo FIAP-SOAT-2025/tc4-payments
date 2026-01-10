@@ -7,11 +7,15 @@ import WebhookUpdatePaymentStatusUseCase from "src/payments/usecases/webhookUpda
 import { PaymentGatewayInterface } from "src/payments/interfaces/payment-gateway.interface";
 import { OrderGatewayInterface } from "src/payments/interfaces/order-gateway.interface";
 import { PaymentController } from "src/payments/controllers/payment.controller";
+import { FindPaymentUseCase } from "src/payments/usecases/findPayment.usecase";
+import { PaymentResponseAdapter } from "src/payments/infrastructure/adapters/payment-response.adapter";
 
 jest.mock("src/payments/gateways/payment.gateway");
 jest.mock("src/payments/gateways/order-provider.gateway");
 jest.mock("src/payments/usecases/webhookUpdatePaymentStatus.usecase");
 jest.mock("src/payments/presenter/payment.presenter");
+jest.mock("src/payments/usecases/findPayment.usecase");
+jest.mock("src/payments/infrastructure/adapters/payment-response.adapter");
 
 describe("PaymentController", () => {
   let paymentRepositoryMock: jest.Mocked<PaymentGatewayInterface>;
@@ -110,6 +114,64 @@ describe("PaymentController", () => {
       expect(
         orderProviderInstance.callUpdateOrderPaymentStatusApi
       ).toHaveBeenCalledWith(payment.orderId, OrderStatusEnum.PENDING);
+    });
+  });
+
+  describe("getPaymentStatus", () => {
+    const paymentId = "payment-id-123";
+    const mockPayment = makePayment({
+      id: paymentId,
+      orderId: "order-123",
+      status: PaymentStatusEnum.APPROVED,
+    });
+
+    beforeEach(() => {
+      (FindPaymentUseCase.getPaymentStatus as jest.Mock).mockResolvedValue(
+        mockPayment
+      );
+      (PaymentResponseAdapter.adaptJsonToMessage as jest.Mock).mockReturnValue(
+        JSON.stringify(mockPayment)
+      );
+    });
+
+    it("should get payment status and return adapted response", async () => {
+      const result = await PaymentController.getPaymentStatus(
+        paymentRepositoryMock,
+        paymentId
+      );
+
+      expect(FindPaymentUseCase.getPaymentStatus).toHaveBeenCalledWith(
+        paymentId,
+        expect.any(PaymentGateway)
+      );
+
+      expect(PaymentResponseAdapter.adaptJsonToMessage).toHaveBeenCalledWith(
+        mockPayment
+      );
+
+      expect(result).toBe(JSON.stringify(mockPayment));
+    });
+
+    it("should create PaymentGateway with repository", async () => {
+      await PaymentController.getPaymentStatus(
+        paymentRepositoryMock,
+        paymentId
+      );
+
+      expect(PaymentGateway).toHaveBeenCalledWith(paymentRepositoryMock);
+    });
+
+    it("should call FindPaymentUseCase with correct parameters", async () => {
+      await PaymentController.getPaymentStatus(
+        paymentRepositoryMock,
+        paymentId
+      );
+
+      expect(FindPaymentUseCase.getPaymentStatus).toHaveBeenCalledTimes(1);
+      expect(FindPaymentUseCase.getPaymentStatus).toHaveBeenCalledWith(
+        paymentId,
+        expect.any(PaymentGateway)
+      );
     });
   });
 });
