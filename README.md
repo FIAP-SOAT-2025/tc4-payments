@@ -5,6 +5,7 @@
 ## 📚 Recursos Importantes
 [![Documentação Técnica e Arquitetural](https://img.shields.io/badge/📖-Documentação_Técnica-blue)](docs/TECHNICAL.md)
 [![Postman Collection](https://img.shields.io/badge/📮-Postman_Collection-orange)](docs/collections/payments-collection)
+[![BDD Specs](https://img.shields.io/badge/🥒-BDD_Specifications-green)](src/payments/test/domain/entities/payment.entity.feature)
 ### 
 
 ## 📋 Sumário
