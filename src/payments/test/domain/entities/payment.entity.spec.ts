@@ -127,4 +127,101 @@ describe('Payment Entity', () => {
 
     expect(payment.status).toBe(PaymentStatusEnum.APPROVED);
   });
+
+  it('should create payment with PIX type', () => {
+    const pixPayment = new Payment('order-123', PaymentTypeEnum.PIX);
+    expect(pixPayment.type).toBe(PaymentTypeEnum.PIX);
+    expect(pixPayment.id).toBeDefined();
+    expect(pixPayment.createdAt).toBeInstanceOf(Date);
+  });
+
+  it('should create payment with DEBIT_CARD type', () => {
+    const debitPayment = new Payment('order-123', PaymentTypeEnum.DEBIT_CARD);
+    expect(debitPayment.type).toBe(PaymentTypeEnum.DEBIT_CARD);
+    expect(debitPayment.id).toBeDefined();
+  });
+
+  it('should update status to PENDING', () => {
+    payment.status = PaymentStatusEnum.PENDING;
+    expect(payment.status).toBe(PaymentStatusEnum.PENDING);
+  });
+
+  it('should update status to REFUSED', () => {
+    payment.status = PaymentStatusEnum.REFUSED;
+    expect(payment.status).toBe(PaymentStatusEnum.REFUSED);
+  });
+
+  it('should update status to EXPIRED', () => {
+    payment.status = PaymentStatusEnum.EXPIRED;
+    expect(payment.status).toBe(PaymentStatusEnum.EXPIRED);
+  });
+
+  it('should update status to CANCELLED', () => {
+    payment.status = PaymentStatusEnum.CANCELLED;
+    expect(payment.status).toBe(PaymentStatusEnum.CANCELLED);
+  });
+
+  it('should set mercadoPagoPaymentId to undefined', () => {
+    payment.mercadoPagoPaymentId = 'mp-123';
+    expect(payment.mercadoPagoPaymentId).toBe('mp-123');
+    payment.mercadoPagoPaymentId = undefined;
+    expect(payment.mercadoPagoPaymentId).toBeUndefined();
+  });
+
+  it('should set qrCode to undefined', () => {
+    payment.qrCode = 'qr-code-test';
+    expect(payment.qrCode).toBe('qr-code-test');
+    payment.qrCode = undefined;
+    expect(payment.qrCode).toBeUndefined();
+  });
+
+  it('should update updatedAt on multiple status changes', async () => {
+    payment.status = PaymentStatusEnum.PENDING;
+    await new Promise((r) => setTimeout(r, 1));
+    const intermediateUpdatedAt = payment.updatedAt;
+    await new Promise((r) => setTimeout(r, 1));
+    payment.status = PaymentStatusEnum.APPROVED;
+
+    expect(payment.status).toBe(PaymentStatusEnum.APPROVED);
+    expect(payment.updatedAt.getTime()).toBeGreaterThan(
+      intermediateUpdatedAt.getTime(),
+    );
+  });
+
+  it('should create payment with different orderId', () => {
+    const newPayment = new Payment('order-999', PaymentTypeEnum.CREDIT_CARD);
+    expect(newPayment.orderId).toBe('order-999');
+    expect(newPayment.id).toBeDefined();
+  });
+
+  it('should update type from CREDIT_CARD to DEBIT_CARD', () => {
+    expect(payment.type).toBe(PaymentTypeEnum.CREDIT_CARD);
+    payment.type = PaymentTypeEnum.DEBIT_CARD;
+    expect(payment.type).toBe(PaymentTypeEnum.DEBIT_CARD);
+  });
+
+  describe.each([
+    [PaymentTypeEnum.PIX],
+    [PaymentTypeEnum.CREDIT_CARD],
+    [PaymentTypeEnum.DEBIT_CARD],
+  ])('Payment creation with different types', (paymentType) => {
+    it(`should create payment with type ${paymentType}`, () => {
+      const newPayment = new Payment('order-123', paymentType);
+      expect(newPayment.type).toBe(paymentType);
+      expect(newPayment.id).toBeDefined();
+    });
+  });
+
+  describe.each([
+    [PaymentStatusEnum.APPROVED],
+    [PaymentStatusEnum.PENDING],
+    [PaymentStatusEnum.REFUSED],
+    [PaymentStatusEnum.EXPIRED],
+    [PaymentStatusEnum.CANCELLED],
+  ])('Payment status transitions', (status) => {
+    it(`should update status to ${status}`, () => {
+      payment.status = status;
+      expect(payment.status).toBe(status);
+    });
+  });
 });
